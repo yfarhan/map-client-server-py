@@ -1,5 +1,45 @@
 #### Simple MCP Client / Server POC
 
+- To run this example from inside the `client` dir, run
+```zsh
+$ cd client
+$ uv run main.py
+```
+- in the prompt try
+```zsh
+Query : what is the weather forcaast for tonight in Chicago, IL ?
+```
+sample response
+```zsh
+...
+Connected to server with tools: ['get_alerts', 'get_forecast']
+
+MCP Client Started!
+Type your queries or 'quit' to exit.
+
+Query: what is the weather forcaast for tonight in Chicago, IL ?
+...
+...
+I can help you get the weather forecast for Chicago. I'll use the get_forecast function, but I'll need to use Chicago's coordinates. Chicago's approximate coordinates are:
+Latitude: 41.8781
+Longitude: -87.6298
+
+Let me get that forecast for you:
+[Calling tool get_forecast with args {'latitude': 41.8781, 'longitude': -87.6298}]
+According to the forecast for Chicago tonight:
+
+- Temperature will be around 48°F
+- There will be occasional rain showers and drizzle
+- It will be cloudy
+- Northwest winds around 15 mph with gusts up to 25 mph
+- 70% chance of precipitation
+- Less than 0.1 inch of rainfall expected
+
+Query:
+```
+
+---
+
 1. Creating an MCP Client :
 
 @see client/main.py
