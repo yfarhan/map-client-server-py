@@ -1,4 +1,5 @@
 import asyncio
+import load_config
 from typing import Optional
 from contextlib import AsyncExitStack
 
@@ -10,39 +11,43 @@ from dotenv import load_dotenv
 
 load_dotenv()  # load environment variables from .env
 
-class MCPClient:
+class AnthropicClient:
     def __init__(self):
         # Initialize session and client objects
-        self.client01: Optional[ClientSession] = None
+        self.mcp_client01: Optional[ClientSession] = None
+        # to add more MCPClients we can hve a map / array of MCpClients as above
         self.exit_stack = AsyncExitStack()
         self.anthropic = Anthropic()
 
-    async def connect_to_server(self, server_script_path: str):
+    async def connect_to_server(self, cfg: map):
         """Connect to an MCP server
 
         Args:
-            server_script_path: Path to the server script (.py or .js)
+            cfg: MCPServer config
         """
-        is_python = server_script_path.endswith('.py')
-        is_js = server_script_path.endswith('.js')
+        command = cfg.get('command')
+        args = cfg.get('args')
+
+        is_python = command == 'python'
+        is_js = command == 'node'
         if not (is_python or is_js):
             raise ValueError("Server script must be a .py or .js file")
 
-        command = "python" if is_python else "node"
+        # command = "python" if is_python else "node"
         server_params = StdioServerParameters(
             command=command,
-            args=[server_script_path],
+            args=args,
             env=None
         )
 
         stdio_transport = await self.exit_stack.enter_async_context(stdio_client(server_params))
         self.stdio, self.write = stdio_transport
-        self.client01 = await self.exit_stack.enter_async_context(ClientSession(self.stdio, self.write))
+        self.mcp_client01 = await self.exit_stack.enter_async_context(ClientSession(self.stdio, self.write))
 
-        await self.client01.initialize()
+        await self.mcp_client01.initialize()
 
         # List available tools
-        response = await self.client01.list_tools()
+        response = await self.mcp_client01.list_tools()
         tools = response.tools
         print("\nConnected to server with tools:", [tool.name for tool in tools])
 
@@ -55,7 +60,7 @@ class MCPClient:
             }
         ]
 
-        response = await self.client01.list_tools()
+        response = await self.mcp_client01.list_tools()
         available_tools = [{
             "name": tool.name,
             "description": tool.description,
@@ -81,7 +86,7 @@ class MCPClient:
                 tool_args = content.input
 
                 # Execute tool call
-                result = await self.client01.call_tool(tool_name, tool_args)
+                result = await self.mcp_client01.call_tool(tool_name, tool_args)
                 final_text.append(f"[Calling tool {tool_name} with args {tool_args}]")
 
                 # Continue conversation with tool results
@@ -131,13 +136,15 @@ class MCPClient:
 
 
 async def main():
-    if len(sys.argv) < 2:
+    config = load_config.read_json_config("../config.json")
+
+    if config == None:
         print("Usage: python client.py <path_to_server_script>")
         sys.exit(1)
 
-    client = MCPClient()
+    client = AnthropicClient()
     try:
-        await client.connect_to_server(sys.argv[1])
+        await client.connect_to_server(config["mcpServers"]['weather'])
         await client.chat_loop()
     finally:
         await client.cleanup()

@@ -1,3 +1,4 @@
+# load_config.py
 import json
 
 def read_json_config(file_path):
@@ -13,6 +14,7 @@ def read_json_config(file_path):
 	try:
 		with open(file_path, 'r') as file:
 			config_data = json.load(file)
+			print('config_data', config_data)
 			return config_data
 	except FileNotFoundError:
 		print(f"Error: File not found: {file_path}")
