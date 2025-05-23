@@ -123,3 +123,32 @@ async def process_query(self, query: str) -> str:
   }
 }
 ```
+
+### Prometheus mcpServers
+[Github repo](https://github.com/weetime/prometheus-mcp-server)
+
+##### Installing
+```
+# Install globally
+npm install -g prometheus-mcp-server
+
+# Or install locally
+npm install prometheus-mcp-server
+npm run build
+
+# Or use npx to run without installation
+npx prometheus-mcp-server
+```
+
+Config file, with locally installed / build
+```json
+"prometheus-mcp-server": {
+  "command": "node",
+  "args": [
+    "<FULL_PATH_TO_DIR>/prometheus-mcp-server/build/index.js"
+  ],
+  "env": {
+    "PROMETHEUS_HOST": "http://localhost:9091"
+  }
+}
+```
