@@ -3,7 +3,7 @@
     "weather": {
       "command": "python",
       "args": [
-        "/Users/yasersyed/Project/poc-ai/mcp-client-server-py/mcp-servers/weather.py"
+        "<PATH_TO_DIR>/mcp-client-server-py/mcp-servers/weather.py"
       ]
     }
   }
